@@ -95,6 +95,7 @@ namespace WGApi
                 Values = new Dictionary<string, Dictionary<int, ExpectedValues>>();
                 await AddNewValues(ExclAbsMinVersion, CheckAtLeastUntilVersion);
             }
+            Values = Values.OrderBy(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             Save(SaveFilePath);
         }
 
@@ -160,8 +161,11 @@ namespace WGApi
             if (apiObject.Header.Version != version)
                 throw new Exception("expected-value-version is not the requested version");
 
-
-            Values.Add(version, apiObject.Data.ToDictionary(v => v.TankID));
+            try
+            {
+                Values.Add(version, apiObject.Data.ToDictionary(v => v.TankID));
+            }
+            catch (ArgumentException) { }
             return true;
         }
 
