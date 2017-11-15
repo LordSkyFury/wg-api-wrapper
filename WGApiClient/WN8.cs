@@ -8,6 +8,22 @@ namespace WGApi
 {
     public class WN8
     {
+        public static double Calculate(Statistics statistics, ExpectedValues expectedValues)
+        {
+            if (statistics.Battles == 0)
+                return 0;
+
+            double battles = statistics.Battles;
+
+            return Calculate(
+                statistics.Damage / battles,
+                statistics.Spotted / battles,
+                statistics.Frags / battles,
+                statistics.Decap / battles,
+                statistics.Victories / battles,
+                expectedValues);
+        }
+
         public static double Calculate(double damage, double spotted, double frags, double decap, double winrate, ExpectedValues expectedValues)
         {
             double rDamage = damage / expectedValues.Damage;
@@ -37,7 +53,7 @@ namespace WGApi
                     cumulatedExpected += values * winrateRecord.Battles;
                 }
             cumulatedExpected /= cumulatedStats.Battles;
-            return cumulatedStats.CalculateWN8(cumulatedExpected);
+            return Calculate(cumulatedStats, cumulatedExpected);
         }
 
         public static double EstimatedAccountWN8Newest(IExpectedValueList expectedValueList, WinrateRecord[] winrateRecords, Statistics cumulatedStats)
@@ -71,7 +87,7 @@ namespace WGApi
                     cumulatedStats += pair.Value;
                 }
             cumulatedExpected /= cumulatedStats.Battles;
-            return cumulatedStats.CalculateWN8(cumulatedExpected);
+            return Calculate(cumulatedStats, cumulatedExpected);
         }
 
         public static double AccountWN8Newest(IExpectedValueList expectedValueList, Dictionary<int, Statistics> tankStats)

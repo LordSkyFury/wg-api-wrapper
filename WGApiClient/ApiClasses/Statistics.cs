@@ -36,26 +36,7 @@ namespace WGApi
         [JsonProperty("damage_received")]
         public int DamageReceived { get; set; }
 
-        [JsonIgnore]
-        public double AvgSpotted { get { return SafelyDivide(Spotted, Battles); } }
-        [JsonIgnore]
-        public double Winrate { get { return SafelyDivide(Victories, Battles); } }
-        [JsonIgnore]
-        public double AvgDamage { get { return SafelyDivide(Damage, Battles); } }
-        [JsonIgnore]
-        public double AvgExperience { get { return SafelyDivide(Experience, Battles); } }
-        [JsonIgnore]
-        public double AvgFrags { get { return SafelyDivide(Frags, Battles); } }
-        [JsonIgnore]
-        public double AvgSurvivedBattles { get { return SafelyDivide(SurvivedBattles, Battles); } }
-        [JsonIgnore]
-        public double AvgCap { get { return SafelyDivide(Cap, Battles); } }
-        [JsonIgnore]
-        public double AvgDecap { get { return SafelyDivide(Decap, Battles); } }
-        [JsonIgnore]
-        public double AvgDamageReceived { get { return SafelyDivide(DamageReceived, Battles); } }
-        [JsonIgnore]
-        public double Hitrate { get { return SafelyDivide(Hits, Shots); } }
+        
 
         public Statistics() { }
 
@@ -106,18 +87,6 @@ namespace WGApi
                 Draws = operation(first.Draws, second?.Draws ?? i),
                 DamageReceived = operation(first.DamageReceived, second?.DamageReceived ?? i),
             };
-        }
-
-        private double SafelyDivide(int dividend, int divisor)
-        {
-            if (divisor == 0)
-                return 0;
-            return dividend / (double)divisor;
-        }
-
-        public double CalculateWN8(ExpectedValues expectedValues)
-        {
-            return WN8.Calculate(AvgDamage, AvgSpotted, AvgFrags, AvgDecap, Winrate, expectedValues);
         }
     }
 }
