@@ -67,10 +67,7 @@ namespace WGApi
             get
             {
                 if (_Directory == null)
-                {
-                    Uri baseUri = new Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase);
-                    _Directory = WebUtility.UrlDecode(Path.GetDirectoryName(baseUri.AbsolutePath));
-                }
+                    _Directory = Path.GetFullPath("expected_values");
                 return _Directory;
             }
         }
@@ -85,6 +82,11 @@ namespace WGApi
 
         protected abstract string ExclAbsMinVersion { get; }
         protected abstract string CheckAtLeastUntilVersion { get; }
+
+        public ExpectedValueListBase()
+        {
+            System.IO.Directory.CreateDirectory(Directory);
+        }
 
         public async Task Initialize()
         {
