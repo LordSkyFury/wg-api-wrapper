@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WGApi.Enums
+namespace WGApi
 {
     [Flags]
     public enum MarksOfExcellence
