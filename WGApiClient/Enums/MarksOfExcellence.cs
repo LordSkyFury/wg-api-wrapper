@@ -10,10 +10,11 @@ namespace WGApi
     public enum MarksOfExcellence
     {
         None = 0,
-        One = 1 << 0,
-        Two = 1 << 1,
-        Three = 1 << 2,
+        Zero = 1 << 0,
+        One = 1 << 1,
+        Two = 1 << 2,
+        Three = 1 << 3,
 
-        All = ~(~0 << 3),
+        All = ~(~0 << 4),
     }
 }
