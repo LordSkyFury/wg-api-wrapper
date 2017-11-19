@@ -57,6 +57,7 @@
     <Compile Include="ApiClasses\AchievementSection.cs" />
     <Compile Include="ApiClasses\Clan.cs" />
     <Compile Include="ApiClasses\Emblems.cs" />
+    <Compile Include="Enums\MarksOfExcellence.cs" />
     <Compile Include="EpochDateTime.cs" />
     <Compile Include="ExpectedValueList.cs" />
     <Compile Include="ExpectedValues.cs" />
