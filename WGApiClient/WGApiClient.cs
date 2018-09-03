@@ -131,10 +131,20 @@ namespace WGApi
             Interlocked.Increment(ref ApiResponsesCount);
 #endif
             WebRequest request = WebRequest.Create($"{BaseUri}{endpoint}{parameters}");
-            using (var response = await request.GetResponseAsync())
-            using (Stream stream = response.GetResponseStream())
-            using (StreamReader reader = new StreamReader(stream))
-                return reader.ReadToEnd();
+            using (var response = (HttpWebResponse)await request.GetResponseAsync())
+            {
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        using (Stream stream = response.GetResponseStream())
+                        using (StreamReader reader = new StreamReader(stream))
+                            return reader.ReadToEnd();
+                    default:
+                        string error = $"API returned {response.StatusCode}: {response.StatusDescription}";
+                        Logger.CriticalError(error);
+                        throw new Exception(error);
+                }
+            }
         }
 
         private string BuildParameterString(string fields = null, string accountID = null, string clanID = null, string extra = null, string search = null, string type = null)
