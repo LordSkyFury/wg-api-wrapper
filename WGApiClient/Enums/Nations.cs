@@ -20,7 +20,8 @@ namespace WGApi
         Czech   = 1 << 7,
         Sweden  = 1 << 8,
         Poland  = 1 << 9,
+        Italy   = 1 << 10,
 
-        All     = ~(~0 << 10),
+        All     = ~(~0 << 11),
     }
 }
