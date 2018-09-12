@@ -37,7 +37,7 @@ namespace WGApi
     {
         protected override string ExclAbsMinVersion => "2017-10-07";
         protected override string CheckAtLeastUntilVersion => DateTime.Today.ToString("yyyy-MM-dd");
-        protected override string LinkFormat => "https://stat.modxvm.com/wn8-data-exp/json/wn8exp-{0}.json";
+        protected override string LinkFormat => "https://static.modxvm.com/wn8-data-exp/json/wn8exp-{0}.json";
         protected override string FileName => "xvmExpectedValues.json";
         protected override IEnumerable<string> CreateVersionValues(string start)
         {
@@ -47,6 +47,24 @@ namespace WGApi
                 date = date.AddDays(1);
                 yield return date.ToString("yyyy-MM-dd");
             }
+        }
+
+        private SecurityProtocolType OriginalSecurityProtcol;
+
+        protected override void PrepareWebSettings()
+        {
+            base.PrepareWebSettings();
+
+            OriginalSecurityProtcol = ServicePointManager.SecurityProtocol;
+            // https://social.msdn.microsoft.com/Forums/en-US/920862c4-8136-4817-adf8-2a8ccdeb0073/httpwebrequest-rest-call-authentication-failed-because-the-remote-party-has-closed-the-transport?forum=netfxbcl
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls11;
+        }
+
+        protected override void CleanupWebSettings()
+        {
+            ServicePointManager.SecurityProtocol = OriginalSecurityProtcol;
+
+            base.CleanupWebSettings();
         }
     }
 
@@ -88,8 +106,13 @@ namespace WGApi
             System.IO.Directory.CreateDirectory(Directory);
         }
 
+        protected virtual void PrepareWebSettings() { }
+        protected virtual void CleanupWebSettings() { }
+
         public async Task Initialize()
         {
+            PrepareWebSettings();
+
             if (Open(SaveFilePath))
                 await AddNewValues(Versions.Last());
             else
@@ -99,6 +122,8 @@ namespace WGApi
             }
             Values = Values.OrderBy(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             Save(SaveFilePath);
+
+            CleanupWebSettings();
         }
 
         /// <param name="start">exclusive</param>
