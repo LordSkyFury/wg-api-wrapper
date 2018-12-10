@@ -5,6 +5,8 @@ namespace WGApi
 {
     public class PlayerInfo
     {
+        [JsonProperty("account_id")]
+        public int AccountID { get; set; }
         [JsonProperty("clan_id")]
         public int? ClanID { get; set; }
         [JsonProperty("nickname")]
