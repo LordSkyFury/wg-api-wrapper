@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WGApi
 {
-    internal static class EpochDateTime
+    public static class EpochDateTime
     {
         public static DateTime FromEpoch(int epoch)
         {

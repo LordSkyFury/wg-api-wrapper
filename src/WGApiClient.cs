@@ -125,26 +125,50 @@ namespace WGApi
             return JsonConvert.DeserializeObject<WrappedResponse<T>>(apiResponse).Data;
         }
 
+        SemaphoreSlim semaphore = new SemaphoreSlim(1);
+
         private async Task<string> GetApiResponseAsync(string endpoint, string parameters)
         {
+            await semaphore.WaitAsync();
 #if MEASURE
             Interlocked.Increment(ref ApiResponsesCount);
 #endif
-            WebRequest request = WebRequest.Create($"{BaseUri}{endpoint}{parameters}");
-            using (var response = (HttpWebResponse)await request.GetResponseAsync())
+            int attempt = 0;
+            int maxAttempts = 10;
+            while (attempt < maxAttempts)
             {
-                switch (response.StatusCode)
+                WebRequest request = WebRequest.Create($"{BaseUri}{endpoint}{parameters}");
+                using (var response = (HttpWebResponse)await request.GetResponseAsync())
                 {
-                    case HttpStatusCode.OK:
-                        using (Stream stream = response.GetResponseStream())
-                        using (StreamReader reader = new StreamReader(stream))
-                            return reader.ReadToEnd();
-                    default:
-                        string error = $"API returned {response.StatusCode}: {response.StatusDescription}";
-                        Logger.CriticalError(error);
-                        throw new Exception(error);
+                    switch (response.StatusCode)
+                    {
+                        case HttpStatusCode.OK:
+                            using (Stream stream = response.GetResponseStream())
+                            using (StreamReader reader = new StreamReader(stream))
+                            {
+                                string val = reader.ReadToEnd();
+
+                                // WG, in their infinite wisdom, send status code OK when API limit is exceeded...
+                                if (!val.Contains("\"error\":{\"code\":407"))
+                                {
+                                    semaphore.Release();
+                                    return val;
+                                }
+
+                                await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, attempt)));
+                                attempt += 1;
+                                break;
+                            }
+                        default:
+                            string error = $"API returned {response.StatusCode}: {response.StatusDescription}";
+                            Logger.CriticalError(error);
+                            semaphore.Release();
+                            throw new Exception(error);
+                    }
                 }
             }
+            semaphore.Release();
+            throw new Exception("max number of attempts reached");
         }
 
         private string BuildParameterString(string fields = null, string accountID = null, string clanID = null, string extra = null, string search = null, string type = null)
