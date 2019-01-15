@@ -24,7 +24,7 @@ namespace WGApi
         [JsonProperty("created_at")]
         private int EpochCreatedAt { set { CreatedAt = EpochDateTime.FromEpoch(value); } }
         [JsonProperty("emblems")]
-        public Dictionary<string, Emblem> Emblems { get; set; }
+        public ClanEmblems Emblems { get; set; }
 
         public DateTime UpdatedAt { get; set; }
         public DateTime CreatedAt { get; set; }
