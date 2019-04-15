@@ -19,7 +19,7 @@ namespace WGApi
     public class VbaddictExpectedValueList : ExpectedValueListBase
     {
         protected override string ExclAbsMinVersion => "-1";
-        protected override string CheckAtLeastUntilVersion => "29";
+        protected override string CheckAtLeastUntilVersion => "33";
         protected override string LinkFormat => "http://www.wnefficiency.net/exp/expected_tank_values_{0}.json";
         protected override string FileName => "expectedValues.json";
         protected override IEnumerable<string> CreateVersionValues(string start)
@@ -114,7 +114,7 @@ namespace WGApi
             PrepareWebSettings();
 
             if (Open(SaveFilePath))
-                await AddNewValues(Versions.Last());
+                await AddNewValues(Versions.Last(), CheckAtLeastUntilVersion);
             else
             {
                 Values = new Dictionary<string, Dictionary<int, ExpectedValues>>();
